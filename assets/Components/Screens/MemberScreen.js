@@ -35,7 +35,7 @@ const MemberScreen = ({navigation, route}) =>{
     const getGroupMember = async () =>{      
       setGroupId(route.params.groupId)
       
-   
+   console.log("On member screen with group id "+id);
         const response = await fetch("http://192.168.1.106:9191/group/"+id).then(
           res => {
 

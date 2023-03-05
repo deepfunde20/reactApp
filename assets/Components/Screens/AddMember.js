@@ -1,8 +1,9 @@
 import DateTimePicker from '@react-native-community/datetimepicker';
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { View, Text, Button, StyleSheet, TouchableOpacity, Modal, Platform, FlatList, Image } from "react-native";
 // import { Calendar } from "react-native-calendars";
 import { TextInput } from "react-native-gesture-handler";
+import {UserId} from "../AppStack"
 
 
 const AddMember = ({navigation}) =>{
@@ -14,6 +15,7 @@ const AddMember = ({navigation}) =>{
     const [image, setImage] = useState();
 
     
+const uuuid = useContext(UserId)
 
     const allImages = [
       {
@@ -70,7 +72,8 @@ const AddMember = ({navigation}) =>{
                   name: name,
                   mobile: mobile,
                   email: email,
-                  image: image
+                  image: image,
+                  userId:uuuid
                 }),
               });
               navigation.navigate("Contacts")

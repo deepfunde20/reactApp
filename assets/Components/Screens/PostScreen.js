@@ -27,7 +27,7 @@ const getUserDate = async () =>{
 
    
 
-  const response = await fetch("http://192.168.1.106:9191/group/member/"+uuuid);
+  const response = await fetch("http://192.168.1.106:9191/group/user/"+uuuid);
   const myData = await response.json();
   console.log(myData);
   console.log(uuuid);

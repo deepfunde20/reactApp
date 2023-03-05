@@ -1,4 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useFocusEffect } from "@react-navigation/native";
 import React, { useContext, useState } from "react";
 import { View, Text, Button, StyleSheet, TouchableOpacity, FlatList, Image } from "react-native";
 import { TextInput } from "react-native-gesture-handler";
@@ -10,6 +11,8 @@ const ChatScreen = ({navigation}) =>{
  
     const [groupName, onChangeText] = useState();
     const [image, setImage] = useState();
+
+    const [isLoaded, setIsLoaded] = useState(false);
 
     
 
@@ -117,10 +120,33 @@ const ChatScreen = ({navigation}) =>{
     ];
 
  
-    const [userId, setUserId] = useState();
+    const [memberId, setUserId] = useState();
 
     const uuuid = useContext(UserId)
+   // const uuuid= userId;
     // AsyncStorage.getItem('userId').then(val => setUserId(val))
+
+    const [groupMember, setGroupMember] = useState([]);
+    const getGroupMember = async () =>{      
+      try {
+       const response = await fetch("http://192.168.1.106:9191/member/allMember/"+uuuid);
+       const myData = await response.json();
+      
+       setGroupMember(myData);
+  
+      } catch (error) {
+        console.log(error)
+      }
+    }
+
+    useFocusEffect(
+      React.useCallback(() => {
+          getGroupMember();
+      }, [])
+    );
+
+
+
     const addConatactApi = async () =>{
 
         
@@ -142,7 +168,7 @@ const ChatScreen = ({navigation}) =>{
                 console.log("This is group id "+ newGroupId);
 
                
-                console.log("This is User id"+ uuuid);
+                console.log("Adding this memebter to group "+ uuuid);
                 fetch('http://192.168.1.106:9191/group/'+newGroupId+'/addMember', {
                     method: 'POST',
                     headers: {
@@ -150,7 +176,8 @@ const ChatScreen = ({navigation}) =>{
                       'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        memberId: uuuid
+                        memberId: memberId,
+                        userId:uuuid
                       
                       
                     }),
@@ -158,22 +185,11 @@ const ChatScreen = ({navigation}) =>{
                
 
                   navigation.navigate("Groups")
-              });
-
-          
-             
-
-              
+              });             
               
         } catch (error) {
           console.log(error)
-        }
-
-        
-       
-
-
-      
+        }    
       }
     return(
       <View style={styles.mainContainer}>
@@ -191,31 +207,60 @@ const ChatScreen = ({navigation}) =>{
       />
   </View>
   <Text style={styles.labels}>Select Group Icon</Text>
-<FlatList  
-                                  
-                    data={allImages}
-                    keyExtractor={(key) => {
-                      return key.id;
-                    }}
-                    horizontal
-                    renderItem={({ item }) =>     
-                       
-                      (
-                        
-                        <View style={styles.item}>
-                           <TouchableOpacity onPress={()=> {setImage(item.image);}}>
-                          <View style={styles.avatarContainer}>
-                          
-                           <Image source= {item.image} style={styles.avatar}></Image>
-                          </View>         
-                         
-                    </TouchableOpacity>
-                        
-                        </View>
-                       
-                      )          
-                    }
-                  ></FlatList>
+          <FlatList
+
+            data={allImages}
+            keyExtractor={(key) => {
+              return key.id;
+            }}
+            horizontal
+            renderItem={({ item }) =>
+
+            (
+
+              <View style={styles.item}>
+                <TouchableOpacity onPress={() => { setImage(item.image); }}>
+                  <View style={styles.avatarContainer}>
+
+                    <Image source={item.image} style={styles.avatar}></Image>
+                  </View>
+
+                </TouchableOpacity>
+
+              </View>
+
+            )
+            }
+          ></FlatList>
+
+<Text style={styles.labels}>Select first Member</Text>
+          <FlatList
+
+            data={groupMember}
+            keyExtractor={(key) => {
+              return key.id;
+            }}
+            horizontal
+            renderItem={({ item }) =>
+
+            (
+
+              <View style={styles.item}>
+                <TouchableOpacity onPress={() => {setUserId(item.id) }}>
+                  <View style={styles.avatarContainer}>
+
+                    <Image source={item.image} style={styles.avatar}></Image>
+                    <Text>{item.name}</Text>
+                  </View>
+                </TouchableOpacity>
+
+              </View>
+
+            )
+            }
+          ></FlatList>
+
+
 
 
  
@@ -253,28 +298,28 @@ const styles = StyleSheet.create({
         fonstSize: 25,
         color: "#344055",
         fontWeight: "500",
-        paddingTop: 20,
-        paddingBottom: 15,
+        paddingTop: 10,
+        paddingBottom: 10,
         textTransform: "capitalize",
         fontFamily: 'bold',
       },
       decription:{
         fontSize: 20,
         color: "#7d7d7d",
-        paddingBottom: 20,
-        lineHeight: 25,
+        paddingBottom: 10,
+        lineHeight: 15,
         
 
       },
       inputContainer:{
-        marginTop: 20,
+        marginTop: 5,
       },
       labels:{
         fontSize: 18,
         color: "black",
-        marginTop: 10,
+        marginTop: 5,
         marginBottom: 5,
-        lineHeight: 25,
+        lineHeight: 20,
        
       
       },
@@ -288,7 +333,7 @@ const styles = StyleSheet.create({
         fontSize:18,
       },
       buttonContainer4:{
-        marginVertical: 20,
+        marginVertical: 5,
         height: 50,
         merginHorizotal: 10,
         justifyContent: 'center',

@@ -1,7 +1,8 @@
 import { useFocusEffect } from "@react-navigation/native";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { View, Text, Button, StyleSheet, ActivityIndicator, Image } from "react-native";
 import { FlatList, TouchableOpacity } from "react-native-gesture-handler";
+import {UserId} from "../AppStack"
 
 const members = {
     "myGroup": {
@@ -35,11 +36,11 @@ const Contacts = ({navigation, route}) =>{
     const [groupMember, setGroupMember] = useState([]);
     
 
-    
+    const uuuid = useContext(UserId)
 
     const getGroupMember = async () =>{      
         try {
-         const response = await fetch("http://192.168.1.106:9191/member/allMember");
+         const response = await fetch("http://192.168.1.106:9191/member/allMember/"+uuuid);
          const myData = await response.json();
         
          setGroupMember(myData);
