@@ -49,7 +49,7 @@ const onSubmit = ()=>{
 
 
 const registerUser = async () => {
-  fetch("http://192.168.1.106:8080/api/v1/auth/register", {
+  fetch("http://192.168.1.106:9191/api/v1/auth/register", {
     method: "POST",
     headers: {
       Accept: "application/json",

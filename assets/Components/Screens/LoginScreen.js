@@ -53,7 +53,7 @@ setError('')
 
 
     const authenticateUser = async () => {
-      fetch("http://192.168.1.106:8080/api/v1/auth/authenticate", {
+      fetch("http://192.168.1.106:9191/api/v1/auth/authenticate", {
         method: "POST",
         headers: {
           Accept: "application/json",
@@ -65,13 +65,18 @@ setError('')
         }),
       })
         .then((response) => {
-        
-          if (response.status == 403) {
+       
+          if (response.status ==403) {
             throw Error("Invalid Credentials or User is not registerd !!");
           }
           return response.json();
         })
         .then((res) => {
+          if ("error" in res) {
+            throw Error(res.error);
+          } else if ("errorMessage" in res) {
+            throw Error(res.errorMessage);
+          }
           console.log(res.token);
           if (res.token != null) {
             getUser(res.token);
@@ -88,26 +93,19 @@ setError('')
     
    
        
-     const response = await fetch("http://192.168.1.106:8080/user/getUser/"+email,{
+     const response = await fetch("http://192.168.1.106:9191/user/getUser/"+email,{
         headers: { 'Authorization': 'Bearer ' + token }
      })
-
-
-
      const myUser = await response.json();
     console.log(myUser);
      setUser(myUser);
-    
   
      await AsyncStorage.setItem('userId', (user.id).toString())
     
      navigation.navigate("AppStack", {
         userId: myUser.id
     })
-
-     resetValues()
-   
-   
+     resetValues()  
   }
 
 
